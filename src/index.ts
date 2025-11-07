@@ -39,6 +39,7 @@ async function queryPocketBase() {
 
     // query all user
     const userList = await pb.collection('users').getFullList(200, {
+        filter: 'ReciveNotify = true',
         sort: 'created',
     });
 
