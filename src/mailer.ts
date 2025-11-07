@@ -47,26 +47,23 @@ async function sendEmail() {
   }
 }
 
-async function sendNotifyMail(data: RecordModel) {
-  if (!data.expand || !data.expand.UserID) {
+async function sendNotifyMail(post: RecordModel, user: RecordModel) {
+  if (!post || !user) {
     console.error('No user data found in expand.UserID');
     return;
   }
 
-  const postInfo = data.expand.PostID;
-  const user = data.expand.UserID;
-
   const mailOptions = {
     from: `<${process.env.APP_USER}>`,
-    // to: `${user.email}`, // Send to user's actual email
-    to: `<${process.env.APP_USER}>`, // Send to developer for testing
-    subject: `Event ${postInfo.Topic || 'Untitled'} is ready for register!`,
-    text: `Hello ${user.Fname || 'User'},\n\nYou have a new notification for the event ${postInfo.Topic || 'Untitled'}\n\nBest regards,\nRSA Team`,
+    to: `${user.email}`, // Send to user's actual email
+    // to: `<${process.env.APP_USER}>`, // Send to developer for testing
+    subject: `New ${post.Type || 'Untitled'} for ${post.Topic || 'Untitled'}! is registered to our platform`,
+    text: `Hello User,\n\nYou have a new notification ${post.Type || 'Untitled'} for ${post.Topic || 'Untitled'}\n\nBest regards,\nRSA Team`,
     html: `
     <h1>Notify</h1>
-    <p>Hello ${user.Fname || 'User'},</p>
-    <p>You have a new notification for the event <strong>${postInfo.Topic || 'Untitled'}</strong></p>
-    <p>The event <strong>${postInfo.Topic || 'Untitled'}</strong> is ready for registration!</p>
+    <p>Hello User,</p>
+    <p>You have a new notification <strong>${post.Type || 'Untitled'}</strong> for <strong>${post.Topic || 'Untitled'}</strong></p>
+    <p>The <strong>${post.Type || 'Untitled'}</strong> for <strong>${post.Topic || 'Untitled'}</strong> is ready for registration!</p>
   `, 
   };
 
@@ -82,8 +79,8 @@ async function sendNotifyMail(data: RecordModel) {
   }
 }
 
-async function prepareNotifyMail(data: any[]) {
-  if (!data || data.length === 0) {
+async function prepareNotifyMail(data: { PostList: RecordModel[]; UserList: RecordModel[] }) {
+  if (!data || (data.PostList.length === 0 && data.UserList.length === 0)) {
     console.log('No data to send, skipping email.');
     return;
   }
@@ -94,12 +91,15 @@ async function prepareNotifyMail(data: any[]) {
     process.env.PB_ADMIN_USER || '', 
     process.env.PB_ADMIN_PASS || ''
   );
+  
 
-  for (const record of data) {
-    await sendNotifyMail(record);
-    await pb.collection('Favorites').update(record.id, { Notify: true });
-    await pb.collection('Posts').update(record.expand.PostID.id, { Notify: true });
-    console.log(`Updated Notify status for favorite ${record.id}`);
+  for (const post of data.PostList) {
+    for (const user of data.UserList) {
+      await sendNotifyMail(post, user);
+      console.log(`Notify mail sent for post ${post.id} to user ${user.StudentNo}`);
+  }
+  await pb.collection('Posts').update(post.id, { Notify: true });
+  console.log(`Updated Notify status for post ${post.id}`);
   }
 }
 

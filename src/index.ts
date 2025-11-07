@@ -21,31 +21,37 @@ async function queryPocketBase() {
 
     // post list that just verify but not notify yet
     const resultPost = await pb.collection('Posts').getList(1, 50, {
-        filter: 'Verify = true && Notify = false', 
+        filter: 'Verify = true && Notify = false',
+        expand: 'Type',
         sort: '-created',
     });
 
     // user favorite group by post event that not notify yet
-    await Promise.all(resultPost.items.map(async (item) => {
-        favList.push(await pb.collection('Favorites').getFullList(200, {
-            filter: `PostID = "${item.id}" && Notify = false`, 
-            expand: 'PostID,UserID',
-            sort: 'created',
-        }));
-    }));
+    // await Promise.all(resultPost.items.map(async (item) => {
+    //     favList.push(await pb.collection('Favorites').getFullList(200, {
+    //         filter: `PostID = "${item.id}" && Notify = false`, 
+    //         expand: 'PostID,UserID',
+    //         sort: 'created',
+    //     }));
+    // }));
+    // favList = favList.flat();
 
-    favList = favList.flat();
+    // query all user
+    const userList = await pb.collection('users').getFullList(200, {
+        sort: 'created',
+    });
 
     console.log('Query successful, found', resultPost.items.length, 'Post records.');
-    console.log('Favorite list to notify:', favList.length);
+    // console.log('Favorite list to notify:', favList.length);
+    console.log('User to notify:', userList.length, ' users.');
 
-    return favList;
+    return { PostList: resultPost.items, UserList: userList };
 }
 
 async function runScheduledTask() {
   console.log(`\n--- Running scheduled task at ${new Date().toLocaleString()} ---`);
-  const data = await queryPocketBase();
-  await prepareNotifyMail(data);
+  const { PostList, UserList } = await queryPocketBase();
+  await prepareNotifyMail({ PostList, UserList });
   console.log('--- Task finished ---');
 }
 
