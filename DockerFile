@@ -1,11 +1,12 @@
-FROM node:18-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
 COPY package*.json ./
+COPY ./src/* /app/dist/
+COPY ./.env /app/dist/
 
-RUN npm install --production
 
-COPY . .
+RUN npm install
 
 CMD ["npm", "start"]

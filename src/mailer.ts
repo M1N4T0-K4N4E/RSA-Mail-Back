@@ -63,7 +63,7 @@ async function sendNotifyMail(post: RecordModel, user: RecordModel) {
     <h1>Notify</h1>
     <p>Hello User,</p>
     <p>You have a new notification <strong>${post.Type || 'Untitled'}</strong> for <strong>${post.Topic || 'Untitled'}</strong></p>
-    <p>The <strong>${post.Type || 'Untitled'}</strong> for <strong>${post.Topic || 'Untitled'}</strong> is ready for registration!</p>
+    <p>The <strong>${post.Type || 'Untitled'}</strong> for <strong>${post.Topic || 'Untitled'}</strong> is registered to our platform!</p>
   `, 
   };
 
