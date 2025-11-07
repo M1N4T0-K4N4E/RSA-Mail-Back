@@ -13,6 +13,7 @@ async function queryPocketBase() {
 
     console.log('Initializing PocketBase client...');
     let favList: any[] = [];
+    console.log('Connecting to PocketBase at ', process.env.PB_URL);
     const pb = new PocketBase(process.env.PB_URL);
     await pb.collection('_superusers').authWithPassword(
       process.env.PB_ADMIN_USER || '', 
@@ -71,7 +72,14 @@ app.get('/', (req, res) => {
     res.send('PocketBase scheduler service is running.');
 });
 
-runScheduledTask(); // Run immediately on startup
+await sleep(10000).then(() => {
+    console.log('Initial wait complete, starting first scheduled task...');
+    runScheduledTask(); // Run immediately after initial wait
+});
+
+async function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 // Keep the Node.js process running
 process.stdin.resume();
