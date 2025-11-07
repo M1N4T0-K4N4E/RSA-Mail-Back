@@ -21,7 +21,7 @@ async function queryPocketBase() {
     );
 
     // post list that just verify but not notify yet
-    const resultPost = await pb.collection('Posts').getList(1, 50, {
+    const resultPost = await pb.collection('Posts').getFullList(200, {
         filter: 'Verify = true && Notify = false',
         expand: 'Type',
         sort: '-created',
@@ -43,11 +43,11 @@ async function queryPocketBase() {
         sort: 'created',
     });
 
-    console.log('Query successful, found', resultPost.items.length, 'Post records.');
+    console.log('Query successful, found', resultPost.length, 'Post records.');
     // console.log('Favorite list to notify:', favList.length);
     console.log('User to notify:', userList.length, ' users.');
 
-    return { PostList: resultPost.items, UserList: userList };
+    return { PostList: resultPost, UserList: userList };
 }
 
 async function runScheduledTask() {
