@@ -57,13 +57,13 @@ async function sendNotifyMail(post: RecordModel, user: RecordModel) {
     from: `<${process.env.APP_USER}>`,
     to: `${user.email}`, // Send to user's actual email
     // to: `<${process.env.APP_USER}>`, // Send to developer for testing
-    subject: `New ${post.Type || 'Untitled'} for ${post.Topic || 'Untitled'}! is registered to our platform`,
-    text: `Hello User,\n\nYou have a new notification ${post.Type || 'Untitled'} for ${post.Topic || 'Untitled'}\n\nBest regards,\nRSA Team`,
+    subject: `New ${post.expand?.Type?.TypeName || 'Untitled'} for ${post.Topic || 'Untitled'}! is registered to our platform`,
+    text: `Hello User,\n\nYou have a new notification ${post.expand?.Type?.TypeName || 'Untitled'} for ${post.Topic || 'Untitled'}\n\nBest regards,\nRSA Team`,
     html: `
     <h1>Notify</h1>
     <p>Hello User,</p>
-    <p>You have a new notification <strong>${post.Type || 'Untitled'}</strong> for <strong>${post.Topic || 'Untitled'}</strong></p>
-    <p>The <strong>${post.Type || 'Untitled'}</strong> for <strong>${post.Topic || 'Untitled'}</strong> is registered to our platform!</p>
+    <p>You have a new notification <strong>${post.expand?.Type?.TypeName || 'Untitled'}</strong> for <strong>${post.Topic || 'Untitled'}</strong></p>
+    <p>The <strong>${post.expand?.Type?.TypeName || 'Untitled'}</strong> for <strong>${post.Topic || 'Untitled'}</strong> is registered to our platform!</p>
   `, 
   };
 
